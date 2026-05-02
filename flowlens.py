@@ -45,12 +45,12 @@ class FlowLens:
         if func_name in ["auditoria", "menu", "<module>", "input", "wrapper"]: return self._tracer
 
         if event == 'call':
-            # Lógica solicitada: Identificar si es impresión o cálculo
+            # Identificación de intención (Ahora en Inglés)
             es_print = any(x in func_name.lower() for x in ["print", "mostrar", "display", "output"])
-            comentario = "📢 MOSTRAR DATOS (Salida)" if es_print else "⚙️ TRABAJO INTERNO / CÁLCULO"
+            comentario = "📢 DATA OUTPUT" if es_print else "⚙️ INTERNAL PROCESS / CALCULATION"
             
             self.steps.append({
-                "tipo": "INICIO", "func": func_name, "linea": frame.f_lineno,
+                "tipo": "START", "func": func_name, "linea": frame.f_lineno,
                 "data": {k: v for k, v in frame.f_locals.items()}, "nivel": self.indent_level,
                 "accion": comentario
             })
@@ -58,7 +58,7 @@ class FlowLens:
         elif event == 'return':
             self.indent_level -= 1
             self.steps.append({
-                "tipo": "FIN", "func": func_name, "linea": frame.f_lineno,
+                "tipo": "END", "func": func_name, "linea": frame.f_lineno,
                 "data": arg, "nivel": self.indent_level, "ms": 0
             })
         return self._tracer
@@ -74,13 +74,13 @@ class FlowLens:
     def _render(self):
         bloques = ""
         for i, paso in enumerate(self.steps):
-            es_in = paso['tipo'] == "INICIO"
+            es_in = paso['tipo'] == "START"
             color = "#58a6ff" if es_in else "#7ee787"
             margen = paso['nivel'] * 45
             
-            # Encabezado de estado según el tipo de trabajo
-            estado_texto = paso.get('accion', '') if es_in else "🏁 PROCESO COMPLETADO"
-            meta_label = "📥 Argumentos recibidos" if es_in else "📤 Datos generados"
+            # Textos del reporte (Ahora en Inglés)
+            estado_texto = paso.get('accion', '') if es_in else "🏁 PROCESS COMPLETED"
+            meta_label = "📥 Arguments received" if es_in else "📤 Data generated"
             tiempo_html = f"<span class='perf'>⏱️ {paso.get('ms', 0)}ms</span>" if not es_in else ""
 
             bloques += f"""
@@ -92,7 +92,7 @@ class FlowLens:
                         <strong>{paso['func']}</strong> {tiempo_html}
                     </div>
                     <div class="node-body">
-                        <small>Línea {paso['linea']} | {meta_label}:</small><br>
+                        <small>Line {paso['linea']} | {meta_label}:</small><br>
                         <code>{paso['data']}</code>
                     </div>
                 </div>
@@ -121,7 +121,8 @@ class FlowLens:
         </body>
         </html>"""
         
-        with open("flowlens_report.html", "w", encoding="utf-8") as f: f.write(html)
-        webbrowser.open("file://" + os.path.abspath("flowlens_report.html"))
+        ruta = os.path.abspath("flowlens_report.html")
+        with open(ruta, "w", encoding="utf-8") as f: f.write(html)
+        webbrowser.open("file://" + ruta.replace("\\", "/"))
 
 lens = FlowLens()
