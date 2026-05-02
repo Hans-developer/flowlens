@@ -1,92 +1,92 @@
 from flowlens import lens
 import time
 
-# --- CAPA DE VALIDACIÓN (TRABAJO INTERNO) ---
+# --- VALIDATION LAYER (INTERNAL PROCESS) ---
 @lens.track_stats
-def validar_usuario(id_u):
-    return {"status": "ok", "nivel": "premium"}
+def validate_user(user_id):
+    return {"status": "ok", "tier": "premium"}
 
 @lens.track_stats
-def verificar_stock(sku):
+def check_inventory_stock(sku):
     return True
 
 @lens.track_stats
-def comprobar_limite_credito(id_u, monto):
-    return monto < 5000
+def verify_credit_limit(user_id, amount):
+    return amount < 5000
 
-# --- CAPA DE CÁLCULOS (TRABAJO INTERNO) ---
+# --- CALCULATION LAYER (INTERNAL PROCESS) ---
 @lens.track_stats
-def calcular_subtotal(items):
+def calculate_subtotal(items):
     return sum(item['p'] for item in items)
 
 @lens.track_stats
-def aplicar_descuento_lealtad(total):
+def apply_loyalty_discount(total):
     return total * 0.90
 
 @lens.track_stats
-def calcular_iva(neto):
-    return neto * 0.19
+def calculate_tax(net_amount):
+    return net_amount * 0.19
 
 @lens.track_stats
-def estimar_costo_envio(region):
+def estimate_shipping_cost(region):
     return 15.50
 
 @lens.track_stats
-def sumar_total_final(neto, iva, envio):
-    return neto + iva + envio
+def sum_final_total(net_amount, tax, shipping):
+    return net_amount + tax + shipping
 
-# --- CAPA DE SALIDA (MOSTRAR DATOS) ---
+# --- OUTPUT LAYER (DATA OUTPUT) ---
 @lens.track_stats
-def generar_etiqueta_impresion(datos):
-    return f"ETIQUETA_PDF_{datos['id']}"
-
-@lens.track_stats
-def mostrar_confirmacion_pantalla(msj):
-    print(f"PANTALLA: {msj}")
-    return "Renderizado exitoso"
+def generate_print_label(data):
+    return f"PRINT_LABEL_PDF_{data['id']}"
 
 @lens.track_stats
-def mostrar_alerta_seguridad(tipo):
-    print(f"ALERTA: {tipo}")
-    return "Alerta enviada"
-
-# --- PROCESOS DE ORQUESTACIÓN ---
-@lens.track_stats
-def autorizar_pago(id_u, total):
-    if comprobar_limite_credito(id_u, total):
-        return "PAGO_APROBADO"
-    return "RECHAZADO"
+def display_screen_confirmation(msg):
+    print(f"SCREEN: {msg}")
+    return "Render success"
 
 @lens.track_stats
-def preparar_logistica(region, orden_id):
-    costo = estimar_costo_envio(region)
-    return generar_etiqueta_impresion({"id": orden_id, "costo": costo})
+def display_security_alert(alert_type):
+    print(f"ALERT: {alert_type}")
+    return "Alert sent"
+
+# --- ORCHESTRATION PROCESSES ---
+@lens.track_stats
+def authorize_payment(user_id, total):
+    if verify_credit_limit(user_id, total):
+        return "PAYMENT_APPROVED"
+    return "REJECTED"
 
 @lens.track_stats
-def procesar_orden_completa(usuario_id, productos, zona):
-    # 1. Validación
-    usr = validar_usuario(usuario_id)
-    verificar_stock("SKU-99")
+def prepare_logistics(region, order_id):
+    cost = estimate_shipping_cost(region)
+    return generate_print_label({"id": order_id, "cost": cost})
+
+@lens.track_stats
+def process_full_order(user_id, products, zone):
+    # 1. Validation
+    user = validate_user(user_id)
+    check_inventory_stock("SKU-99")
     
-    # 2. Cálculos
-    sub = calcular_subtotal(productos)
-    neto = aplicar_descuento_lealtad(sub)
-    impuesto = calcular_iva(neto)
+    # 2. Calculations
+    sub = calculate_subtotal(products)
+    net = apply_loyalty_discount(sub)
+    tax = calculate_tax(net)
     
-    # 3. Pago
-    pago = autorizar_pago(usuario_id, neto)
+    # 3. Payment
+    payment = authorize_payment(user_id, net)
     
-    # 4. Logística y Salida
-    log = preparar_logistica(zona, "ORD-123")
-    mostrar_confirmacion_pantalla(f"Orden {pago} con éxito.")
+    # 4. Logistics & Output
+    logistics = prepare_logistics(zone, "ORD-123")
+    display_screen_confirmation(f"Order {payment} successfully.")
     
-    return "ORDEN_FINALIZADA"
+    return "ORDER_FINISHED"
 
-# --- EJECUCIÓN DEL TEST ---
+# --- TEST EXECUTION ---
 if __name__ == "__main__":
-    carrito = [{'n': 'Laptop', 'p': 1000}, {'n': 'Mouse', 'p': 50}]
+    cart = [{'n': 'Laptop', 'p': 1000}, {'n': 'Mouse', 'p': 50}]
     
     lens.start()
-    # Este proceso disparará la cadena de 15 llamadas
-    procesar_orden_completa("HANS_SALDIAS", carrito, "RM_CHILE")
+    # This process will trigger the 15-step chain
+    process_full_order("HANS_SALDIAS", cart, "RM_CHILE")
     lens.stop()
