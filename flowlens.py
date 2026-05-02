@@ -1,9 +1,9 @@
+
 import sys
 import webbrowser
 import os
 import time
 import functools
-import asyncio
 from dataclasses import dataclass
 
 @dataclass(slots=True, frozen=True)
@@ -42,24 +42,24 @@ class FlowLens:
             return self._tracer
         
         func_name = frame.f_code.co_name
-        if func_name in ["auditoria", "menu", "<module>", "input", "wrapper"]: return self._tracer
+        if func_name in ["run_test", "menu", "<module>", "input", "wrapper"]: return self._tracer
 
         if event == 'call':
-            # Identificación de intención (Ahora en Inglés)
-            es_print = any(x in func_name.lower() for x in ["print", "mostrar", "display", "output"])
-            comentario = "📢 DATA OUTPUT" if es_print else "⚙️ INTERNAL PROCESS / CALCULATION"
+            # Intent Detection (English Labels)
+            is_output = any(x in func_name.lower() for x in ["print", "show", "display", "output", "render"])
+            comment = "📢 DATA OUTPUT" if is_output else "⚙️ INTERNAL PROCESS / CALCULATION"
             
             self.steps.append({
-                "tipo": "START", "func": func_name, "linea": frame.f_lineno,
-                "data": {k: v for k, v in frame.f_locals.items()}, "nivel": self.indent_level,
-                "accion": comentario
+                "type": "START", "func": func_name, "line": frame.f_lineno,
+                "data": {k: v for k, v in frame.f_locals.items()}, "level": self.indent_level,
+                "action": comment
             })
             self.indent_level += 1
         elif event == 'return':
             self.indent_level -= 1
             self.steps.append({
-                "tipo": "END", "func": func_name, "linea": frame.f_lineno,
-                "data": arg, "nivel": self.indent_level, "ms": 0
+                "type": "END", "func": func_name, "line": frame.f_lineno,
+                "data": arg, "level": self.indent_level, "ms": 0
             })
         return self._tracer
 
@@ -72,28 +72,28 @@ class FlowLens:
         self._render()
 
     def _render(self):
-        bloques = ""
-        for i, paso in enumerate(self.steps):
-            es_in = paso['tipo'] == "START"
-            color = "#58a6ff" if es_in else "#7ee787"
-            margen = paso['nivel'] * 45
+        blocks = ""
+        for i, step in enumerate(self.steps):
+            is_start = step['type'] == "START"
+            color = "#58a6ff" if is_start else "#7ee787"
+            margin = step['level'] * 45
             
-            # Textos del reporte (Ahora en Inglés)
-            estado_texto = paso.get('accion', '') if es_in else "🏁 PROCESS COMPLETED"
-            meta_label = "📥 Arguments received" if es_in else "📤 Data generated"
-            tiempo_html = f"<span class='perf'>⏱️ {paso.get('ms', 0)}ms</span>" if not es_in else ""
+            # Status and Labels (Fully in English)
+            status_text = step.get('action', '') if is_start else "🏁 PROCESS COMPLETED"
+            meta_label = "📥 Arguments received" if is_start else "📤 Data generated"
+            time_html = f"<span class='perf'>⏱️ {step.get('ms', 0)}ms</span>" if not is_start else ""
 
-            bloques += f"""
-            <div class="trace-box" style="margin-left:{margen}px; border-left: 3px solid {color}">
-                <div class="action-label">{estado_texto}</div>
+            blocks += f"""
+            <div class="trace-box" style="margin-left:{margin}px; border-left: 3px solid {color}">
+                <div class="action-label">{status_text}</div>
                 <div class="node">
                     <div class="node-header">
-                        <span class="tag" style="background:{color}">{paso['tipo']}</span>
-                        <strong>{paso['func']}</strong> {tiempo_html}
+                        <span class="tag" style="background:{color}">{step['type']}</span>
+                        <strong>{step['func']}</strong> {time_html}
                     </div>
                     <div class="node-body">
-                        <small>Line {paso['linea']} | {meta_label}:</small><br>
-                        <code>{paso['data']}</code>
+                        <small>Line {step['line']} | {meta_label}:</small><br>
+                        <code>{step['data']}</code>
                     </div>
                 </div>
             </div>"""
@@ -103,6 +103,7 @@ class FlowLens:
         <html>
         <head>
             <meta charset="UTF-8">
+            <title>FlowLens Audit Timeline</title>
             <style>
                 body {{ background: #0d1117; color: #c9d1d9; font-family: 'Consolas', monospace; padding: 50px; }}
                 h1 {{ color: #58a6ff; text-align: center; margin-bottom: 40px; border-bottom: 1px solid #30363d; padding-bottom: 20px; }}
@@ -117,12 +118,12 @@ class FlowLens:
         </head>
         <body>
             <h1>FlowLens Audit Timeline</h1>
-            <div class="timeline">{bloques}</div>
+            <div class="timeline">{blocks}</div>
         </body>
         </html>"""
         
-        ruta = os.path.abspath("flowlens_report.html")
-        with open(ruta, "w", encoding="utf-8") as f: f.write(html)
-        webbrowser.open("file://" + ruta.replace("\\", "/"))
+        path = os.path.abspath("flowlens_report.html")
+        with open(path, "w", encoding="utf-8") as f: f.write(html)
+        webbrowser.open("file://" + path.replace("\\", "/"))
 
 lens = FlowLens()
