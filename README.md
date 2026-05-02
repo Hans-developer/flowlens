@@ -1,80 +1,80 @@
 ========================================================================
-🔍 FLOWLENS v2.1 - Herramienta de Auditoría y Trazabilidad Visual
+🔍 FLOWLENS v2.1 - Visual Audit & Execution Tracing Tool
 ========================================================================
 
-DESCRIPCIÓN:
-FlowLens es un motor de rastreo para Python diseñado para auditar la 
-ejecución lógica de algoritmos. Transforma la ejecución de código en 
-un reporte HTML interactivo que permite visualizar el flujo de 
-procesos, tiempos de respuesta y la naturaleza de cada operación.
+DESCRIPTION:
+FlowLens is a Python tracing engine designed to audit the logical 
+execution of algorithms. It transforms code execution into an 
+interactive HTML report that allows you to visualize process flow, 
+response times, and the nature of each operation.
 
-Ideal para desarrolladores independientes e investigadores que 
-buscan una forma profesional de mostrar cómo funcionan sus sistemas.
+Ideal for independent developers and researchers looking for a 
+professional way to demonstrate how their systems work.
 
-AUTOR: Hans Saldias (Analista Programador)
-ESTADO: Propuesta para la comunidad de CPython
-
-------------------------------------------------------------------------
-✨ CARACTERÍSTICAS PRINCIPALES
-------------------------------------------------------------------------
-
-*   ORDEN CRONOLÓGICO: Muestra exactamente dónde comienza (INICIO) y 
-    termina (FIN) cada proceso.
-*   DETECCIÓN DE INTENCIÓN: Clasifica automáticamente si la función es 
-    un "TRABAJO INTERNO / CÁLCULO" o si es para "MOSTRAR DATOS".
-*   MÉTRICAS DE RENDIMIENTO: Registra el tiempo exacto de ejecución 
-    en milisegundos (ms) para cada bloque.
-*   TRAZABILIDAD DE DATOS: Captura los argumentos de entrada y los 
-    valores de retorno en cada paso.
+AUTHOR: Hans Saldias (Analyst Programmer)
+STATUS: Proposal for the CPython Community
 
 ------------------------------------------------------------------------
-🚀 CÓMO UTILIZAR FLOWLENS
+✨ KEY FEATURES
 ------------------------------------------------------------------------
 
-1. REQUISITOS:
-   No requiere dependencias externas. Solo necesitas tener el archivo 
-   `flowlens.py` en tu carpeta de proyecto.
+* CHRONOLOGICAL ORDER: Shows exactly where each process begins 
+    (START) and ends (END).
+* INTENT DETECTION: Automatically classifies if a function is an 
+    "INTERNAL PROCESS / CALCULATION" or a "DATA OUTPUT".
+* PERFORMANCE METRICS: Records exact execution time in 
+    milliseconds (ms) for every block.
+* DATA TRACEABILITY: Captures input arguments and return values 
+    at every step.
 
-2. IMPLEMENTACIÓN RÁPIDA:
-   Importa el objeto `lens` y usa el decorador `@lens.track_stats` 
-   en las funciones que deseas auditar.
+------------------------------------------------------------------------
+🚀 HOW TO USE FLOWLENS
+------------------------------------------------------------------------
 
-   Ejemplo:
+1. REQUIREMENTS:
+   No external dependencies required. You only need to have the 
+   `flowlens.py` file in your project folder.
+
+2. QUICK IMPLEMENTATION:
+   Import the `lens` object and use the `@lens.track_stats` decorator 
+   on the functions you wish to audit.
+
+   Example:
    
    from flowlens import lens
 
    @lens.track_stats
-   def mi_algoritmo(valor):
-       # Esto será detectado como cálculo interno
-       return valor * 2
+   def my_algorithm(value):
+       # This will be detected as an internal calculation
+       return value * 2
 
    @lens.track_stats
-   def mostrar_datos(resultado):
-       # Esto será detectado como salida de datos
-       print(resultado)
+   def show_data(result):
+       # This will be detected as a data output
+       print(result)
 
-   # Iniciar captura
+   # Start capturing
    lens.start()
    
-   # Ejecutar lógica
-   res = mi_algoritmo(50)
-   mostrar_datos(res)
+   # Execute logic
+   res = my_algorithm(50)
+   show_data(res)
    
-   # Detener y generar reporte
+   # Stop and generate report
    lens.stop()
 
-3. RESULTADO:
-   Se generará un archivo llamado `flowlens_report.html` que se 
-   abrirá automáticamente en tu navegador predeterminado.
+3. RESULT:
+   A file named `flowlens_report.html` will be generated and will 
+   automatically open in your default web browser.
 
 ------------------------------------------------------------------------
-📂 ARCHIVOS DEL PROYECTO
+📂 PROJECT FILES
 ------------------------------------------------------------------------
 
-*   flowlens.py       -> El núcleo del motor de auditoría.
-*   demo_test.py      -> Script de prueba con 15 procesos integrados.
-*   README.txt        -> Instrucciones de uso.
+* flowlens.py       -> The core audit engine.
+* test_auditoria_15.py -> Integration test script with 15 processes.
+* README.txt        -> Usage instructions.
 
 ------------------------------------------------------------------------
-"La claridad en el código es la base de una auditoría segura."
+"Code clarity is the foundation of a secure audit."
 ========================================================================
