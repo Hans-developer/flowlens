@@ -1,4 +1,3 @@
-
 import sys
 import webbrowser
 import os
@@ -127,3 +126,4 @@ class FlowLens:
         webbrowser.open("file://" + path.replace("\\", "/"))
 
 lens = FlowLens()
+
